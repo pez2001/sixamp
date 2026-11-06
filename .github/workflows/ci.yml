@@ -1,0 +1,49 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.9", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "${{ matrix.python }}"}
+      - run: pip install numpy miniaudio pyflakes
+      - run: python -m pyflakes sixamp.py tests
+      - run: python tests/smoke.py
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.13"}
+      - run: pip install numpy miniaudio
+      - run: python sixamp.py --version
+      - name: import the module and encode a frame
+        run: python -c "import sixamp, numpy as np; assert sixamp.WINDOWS; print(len(sixamp.sixel(np.zeros((12, 12), np.uint8) + sixamp.WHITE, sixamp.PALETTE)))"
+
+  # what `pip install sixamp` gives people: build, check, install the wheel and run it from outside the checkout
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.13"}
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check --strict dist/*
+      - name: install the wheel into a clean venv and run it
+        run: |
+          python -m venv /tmp/v
+          /tmp/v/bin/pip install dist/*.whl
+          cd /tmp && /tmp/v/bin/sixamp --version
+          /tmp/v/bin/python $GITHUB_WORKSPACE/tests/smoke.py /tmp/v/bin/sixamp

@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sixamp"
+dynamic = ["version"]
+description = "A 1990s-style MP3 player for the terminal, drawn in Sixel graphics, with spectrum analyser, equalizer and playlist"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES"]
+dependencies = ["numpy>=1.21", "miniaudio>=1.59"]
+keywords = ["mp3", "music player", "sixel", "terminal", "tui", "retro", "equalizer"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Multimedia :: Sound/Audio :: Players",
+    "Topic :: Multimedia :: Sound/Audio :: Players :: MP3",
+    "Topic :: Terminals",
+]
+
+[project.urls]
+Homepage = "https://github.com/pez2001/sixamp"
+Issues = "https://github.com/pez2001/sixamp/issues"
+Changelog = "https://github.com/pez2001/sixamp/blob/main/CHANGELOG.md"
+
+[project.scripts]
+sixamp = "sixamp:main"
+
+[tool.setuptools]
+py-modules = ["sixamp"]
+
+[tool.setuptools.dynamic]
+version = {attr = "sixamp.__version__"}
